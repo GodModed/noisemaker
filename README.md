@@ -2,8 +2,9 @@
 Play noise through an ESP32.
 
 ## Current State of Project
-- Waiting for parts to ship
-
+- [x] Waiting for parts to ship
+- [x] Run test code on esp32
+- [ ] Write sample code to play a tone on speaker
 
 ## Required Parts
 | Part | What it does | How many to use |
