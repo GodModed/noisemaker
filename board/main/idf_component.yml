@@ -16,4 +16,5 @@ dependencies:
   #   public: true
   espressif/arduino-esp32:
     git: https://github.com/espressif/arduino-esp32.git
-    version: "4.0.0-RC1"
+    version: 4.0.0-RC1
+  bblanchon/arduinojson: ^7.4.2

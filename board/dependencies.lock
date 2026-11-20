@@ -1,4 +1,11 @@
 dependencies:
+  bblanchon/arduinojson:
+    component_hash: 5e6aff2bc5bc988b36c8e90c01e637495ee895ad3af93911860c21ec6da79b6a
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 7.4.3
   chmorgan/esp-libhelix-mp3:
     component_hash: cbb76089dc2c5749f7b470e2e70aedc44c9da519e04eb9a67d4c7ec275229e53
     dependencies:
@@ -429,7 +436,7 @@ dependencies:
       type: service
     version: 1.0.0
   espressif/rmaker_common:
-    component_hash: 47540e04384badab2c64677bdabf23fb9ee191be2f7f54794fd609fe99d409b4
+    component_hash: 83fff62374eef26e2bf17c08a88e97e2052ce8780f5dd7c4da5e826dcae9fa44
     dependencies:
     - name: espressif/mqtt
       registry_url: https://components.espressif.com
@@ -448,7 +455,7 @@ dependencies:
     - name: espressif/rmaker_console
       registry_url: https://components.espressif.com
       require: private
-      version: ^1.1.0
+      version: ^1.1.1
     - name: espressif/rmaker_system_ctrl
       registry_url: https://components.espressif.com
       require: private
@@ -467,7 +474,7 @@ dependencies:
     source:
       registry_url: https://components.espressif.com
       type: service
-    version: 1.12.0
+    version: 1.12.1
   espressif/rmaker_common_events:
     component_hash: 3cd947e1e97c3c391087f0f82167c830dd20dd852e36db3c918f9bbff484b2ff
     dependencies:
@@ -479,7 +486,7 @@ dependencies:
       type: service
     version: 1.2.0
   espressif/rmaker_console:
-    component_hash: 627c588581909ea68676f100e1ad0643fab7b5402c5d5cc4994785d61fa69326
+    component_hash: f3b61c1d973772c3705cadd510eb3f226ba44bf63be52511fd47d42e2b626157
     dependencies:
     - name: espressif/rmaker_system_ctrl
       registry_url: https://components.espressif.com
@@ -495,7 +502,7 @@ dependencies:
     source:
       registry_url: https://components.espressif.com
       type: service
-    version: 1.1.0
+    version: 1.1.1
   espressif/rmaker_system_ctrl:
     component_hash: b4208fbc7e99b30fb1d272cbd30e578327079a6495499d12fb466b6c2fc0d899
     dependencies:
@@ -559,8 +566,9 @@ dependencies:
       type: service
     version: 1.23.1
 direct_dependencies:
+- bblanchon/arduinojson
 - espressif/arduino-esp32
 - idf
-manifest_hash: ab94932c2c7a953fd2d4ac109b7e9206ea7abc6670ae6a286610b92b03319caf
+manifest_hash: 7a20f7a0a001aea601718fda2cc6d7f877a77efd6ae193cf6d5f5ba0a9a7a68a
 target: esp32
 version: 3.0.0

@@ -2,12 +2,11 @@
 #include <WiFi.h>
 #include <ESP_I2S.h>
 #include <WebSocketsClient.h>
+#include <ArduinoJson.h>
 
-#define SERVER_URL "launches-findarticles-php-chubby.trycloudflare.com"
+#define SERVER_URL "institutes-pregnancy-freely-consultant.trycloudflare.com"
 
-#define SAMPLE_RATE 16000
-
-int frequency = 440;
+JsonDocument state;
 
 #define BCLK_PIN 26
 #define LRC_PIN 27
@@ -15,6 +14,7 @@ int frequency = 440;
 
 I2SClass I2S;
 WebSocketsClient webSocket;
+
 
 void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
     switch (type) {
@@ -26,15 +26,8 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
             break;
         case WStype_TEXT:
             Serial.printf("WebSocket text message: %s\n", payload);
-            // if its able to be parsed as a number, set it to frequency
-            if (length > 0) {
-                String payloadStr = String((char*)payload);
-                int newFrequency = payloadStr.toInt();
-                if (newFrequency > 0) {
-                    frequency = newFrequency;
-                    Serial.printf("Frequency set to: %d\n", frequency);
-                }
-            }
+            deserializeJson(state, payload);
+
             break;
         case WStype_BIN:
             Serial.printf("WebSocket binary message of length: %u\n", length);
@@ -46,6 +39,13 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
 void setup()
 {
+
+    // set initial config
+    state["volume"] = 0.5;
+    state["frequency"] = 1000;
+    state["playing"] = 0;
+    state["sampleRate"] = 16000;
+
     Serial.begin(115200);
 
     // set ntp time
@@ -64,7 +64,7 @@ void setup()
 
     I2S.setPins(BCLK_PIN, LRC_PIN, DATA_PIN);
 
-    if (!I2S.begin(I2S_MODE_STD, SAMPLE_RATE, I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO)) {
+    if (!I2S.begin(I2S_MODE_STD, state["sampleRate"], I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO)) {
         Serial.println("Failed to initialize I2S");
         while (1) {
             delay(1000);
@@ -77,10 +77,11 @@ void setup()
 }
 
 void sendAudioFrame() {
+
     int16_t samples[256 * 2]; // 256 samples for stereo
     for (int i = 0; i < 256; i++) {
-        float angle = 2.0f * PI * frequency * i / SAMPLE_RATE;
-        int16_t sample = sinf(angle) * 4096; // Scale to 12-bit range
+        float angle = 2.0f * PI * (float) state["frequency"] * i / (float) state["sampleRate"];
+        int16_t sample = sinf(angle) * (float) state["volume"] * 32767; // Scale to 12-bit range
         samples[i * 2] = sample;     // Left channel
         samples[i * 2 + 1] = sample; // Right channel
     }
@@ -91,5 +92,7 @@ void sendAudioFrame() {
 void loop()
 {
     webSocket.loop();
-    sendAudioFrame();
+    if (WiFi.isConnected()) {
+        sendAudioFrame();
+    }
 }

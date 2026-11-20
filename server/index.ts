@@ -12,45 +12,33 @@ const state = new State();
 
 app.get('/', (c) => {
     return c.html(`
+        <!doctype html>
         <html>
             <head>
-                <title>WebSocket Example</title>
+                <title>Noisemaker Manager</title>
             </head>
             <body>
-                <h1>WebSocket Example</h1>
-                <p>Open the console to see WebSocket messages.</p>
-                <input type="range" id="frequencySlider" min="400" max="5000" value="${state.frequency}">
-                <span id="frequencyLabel">Frequency: ${state.frequency} Hz</span>
-                <script>
-                    const input = document.getElementById('frequencySlider');
-                    const label = document.getElementById('frequencyLabel');
-                    input.addEventListener('input', () => {
-                        const value = input.value;
-                        label.textContent = 'Frequency: ' + value + ' Hz';
-                        fetch('/set-frequency?value=' + value);
-                    });
+                <h1>Noisemaker Manager</h1>
 
-                    const ws = new WebSocket('ws://' + location.host + '/ws');
-                    ws.onmessage = (event) => {
-                        console.log('Received from server:', event.data);
-                    };
+                <script>
+                    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    const ws = new WebSocket(\`\${protocol}//\${location.host}/ws\`);
                 </script>
+                ${state.entries().map(([key, value]) => value.getHTML()).join('')}
+
             </body>
         </html>
     `);
 });
 
-app.get('/set-frequency', (c) => {
-    const frequency = parseFloat(c.req.query('value') || '440');
-    state.setState({ frequency });
-    return c.text(`Frequency set to ${frequency}`);
-});
-
 app.get('/ws', upgradeWebSocket(c => {
     return {
         onOpen(event, ws) {
-            ws.send('WebSocket connection established');
             wsConnections.add(ws);
+        },
+        onMessage(event, ws) {
+            const partialState = JSON.parse(event.data.toString());
+            state.setState(partialState);
         },
         onClose(event, ws) {
             console.log('WebSocket closed:', event.code, event.reason);
@@ -61,7 +49,10 @@ app.get('/ws', upgradeWebSocket(c => {
 
 state.addListener(newState => {
     for (const ws of wsConnections) {
-        ws.send(JSON.stringify(newState.frequency));
+        ws.send(JSON.stringify(newState.entries().reduce((result, [key, value]) => {
+            result[key] = value.value;
+            return result;
+        }, {} as Record<string, unknown>)));
     }
 });
 
